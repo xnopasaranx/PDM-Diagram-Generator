@@ -5,8 +5,10 @@ let offset = { x: 0, y: 0 };
 let draw
 const container = document.getElementById('container');
 
-container.addEventListener("click", function() {
-  GenerateTaskOnClick();
+container.addEventListener("click", function(e) {
+    if(container === (e.target)){
+      GenerateTaskOnClick();
+}
 });
 
 
