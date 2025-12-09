@@ -4,6 +4,7 @@ let isDragging = false;
 let offset = { x: 0, y: 0 };
 let draw
 const container = document.getElementById('container');
+const count = document.getElementById('taskcount').value;
 
 container.addEventListener("click", function(e) {
     if(container === (e.target)){
@@ -14,10 +15,11 @@ container.addEventListener("click", function(e) {
 
 function GenerateTaskOnClick() {
   // Generate this task after a click event, to make editing easier
- let id = 0;
+ let id = 1;
  if(tables.length > 0){
-  id = tables.length + 1;
+  id = tables.length;
  }
+ console.log(id)
  GenTable(id)
 }
 
@@ -28,8 +30,6 @@ function GenerateTasks() {
     connections = [];
     // Initializing draw
     draw = SVG().addTo('#arrowLayer').size('100%', '100%');
-
-    const count = document.getElementById('taskcount').value;
 
     for (let i = 1; i <= count; i++) {
         GenTable(i);
