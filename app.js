@@ -1,6 +1,7 @@
 let tables = [];
 let connections = [];
 let isDragging = false;
+let isDrawing = false;
 let offset = { x: 0, y: 0 };
 
 // Initializing draw
@@ -8,11 +9,12 @@ let draw = SVG().addTo('#arrowLayer').size('100%', '100%');
 const container = document.getElementById('container');
 const count = document.getElementById('taskcount').value;
 
-container.addEventListener("click", function(e) {
-    if(container === (e.target)){
+container.addEventListener("contextmenu", function(e) {
+    e.preventDefault();
+    if(container === e.target){
       // don't cause click event if target is not the container element  
       GenerateTaskOnClick(e);
-}
+    }
 });
 
 
@@ -66,6 +68,7 @@ function GenTable(id, cursorpos_xy = null) {
 
    
     setupDraggable(table);
+    setupConnectable(table);
     container.appendChild(table);
     tables[id] = id;
 }
@@ -76,7 +79,8 @@ function ConvertTaskNumberToLetter(taskNumber) {
 
 function setupDraggable(element) {
     element.addEventListener('mousedown', (e) => {
-        if (e.target.tagName.toLowerCase() !== 'input') {
+        // only enter dragging mode if left button is used
+        if (e.target.tagName.toLowerCase() !== 'input' && e.button === 0) {
             isDragging = true;
             currentTable = element;
             offset.x = e.clientX - element.offsetLeft;
@@ -98,8 +102,34 @@ function setupDraggable(element) {
     });
 }
 
-function AddConnections() {
-    connections = [];
+function setupConnectable(element) {
+    element.addEventListener('mousedown', (e) => {
+        // check if right button is used
+        if (e.target.tagName.toLowerCase() !== 'input' && e.button === 3) {
+            isDrawing = true;
+            currentTable = element;
+        }
+            console.log(element.id)
+    });
+
+
+    // document.addEventListener('mousemove', (e) => {
+    //     if (isDragging && currentTable) {
+    //         currentTable.style.left = `${e.clientX - offset.x}px`;
+    //         currentTable.style.top = `${e.clientY - offset.y}px`;
+    //         UpdateArrows();
+    //     }
+    // });
+
+    document.addEventListener('mouseup', (e) => {
+        let el = document.elementFromPoint(e.offsetX, e.offsetY)
+        isDrawing = false;
+        currentTable = null;
+        // UpdateArrows();
+    });
+}
+
+function AddConnections(connections = []) {
     const input = document.getElementById('connection-input').value;
     const pairs = input.split(';');
    
