@@ -2,25 +2,30 @@ let tables = [];
 let connections = [];
 let isDragging = false;
 let offset = { x: 0, y: 0 };
-let draw
+
+// Initializing draw
+let draw = SVG().addTo('#arrowLayer').size('100%', '100%');
 const container = document.getElementById('container');
 const count = document.getElementById('taskcount').value;
 
 container.addEventListener("click", function(e) {
     if(container === (e.target)){
-      GenerateTaskOnClick();
+      // don't cause click event if target is not the container element  
+      GenerateTaskOnClick(e);
 }
 });
 
 
-function GenerateTaskOnClick() {
+function GenerateTaskOnClick(e) {
   // Generate this task after a click event, to make editing easier
  let id = 1;
  if(tables.length > 0){
   id = tables.length;
  }
- console.log(id)
- GenTable(id)
+
+ let cursorpos_xy = [e.offsetX, e.offsetY];
+
+ GenTable(id, cursorpos_xy);
 }
 
 function GenerateTasks() {
@@ -28,15 +33,14 @@ function GenerateTasks() {
     container.innerHTML = '<svg id="arrowLayer"></svg>';
     tables = [];
     connections = [];
-    // Initializing draw
-    draw = SVG().addTo('#arrowLayer').size('100%', '100%');
+    
 
     for (let i = 1; i <= count; i++) {
         GenTable(i);
     }
 }
 
-function GenTable(id) {
+function GenTable(id, cursorpos_xy = null) {
     const table = document.createElement('table');
     table.id = String(id);
 
@@ -56,8 +60,10 @@ function GenTable(id) {
     </tr>`;
    
     // Setting the initial position of the tables to the top-left corner
-    table.style.top = '10px';
-    table.style.left = '10px';
+    // use passed coordinates to position element, if defined
+    table.style.left = `${(cursorpos_xy ? cursorpos_xy[0] : 10)}px`;
+    table.style.top = `${(cursorpos_xy ? cursorpos_xy[1] : 10)}px`;
+
    
     setupDraggable(table);
     container.appendChild(table);
