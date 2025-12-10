@@ -120,10 +120,14 @@ function setupConnectable(element) {
         // check if right button is used
         if (isDrawing && e.target.tagName.toLowerCase() !== 'input') {
             targetTable = element;
-            if(sourceTable !== targetTable){
-                connections.push({from: sourceTable.id, to: targetTable.id});
-                UpdateArrows();
+            let connection = {from: sourceTable.id, to: targetTable.id}
+            let exists = connections.some(e => (e.from === sourceTable.id && e.to === targetTable.id) || (e.from === targetTable.id && e.to === sourceTable.id))
+            if((sourceTable !== targetTable) && !exists){
+                connections.push(connection);
+            } else if ((sourceTable !== targetTable) && exists){
+                connections = connections.filter(obj => !((obj.from === connection.from && obj.to === connection.to) || (obj.to === connection.from && obj.from === connection.to)))
             }
+            UpdateArrows();
             sourceTable = null;
             targetTable = null;
             isDrawing = false;
