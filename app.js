@@ -106,6 +106,13 @@ function setupConnectable(element) {
         if (!isDrawing && e.target.tagName.toLowerCase() !== 'input' ) {
             sourceTable = element;
             isDrawing = true;
+            sourceTable.classList.add('selected')
+            let tablelist = document.getElementsByTagName('table')
+            for(el of tablelist){
+                if(!el.classList.contains('selected')){
+                    el.classList.add('hover')
+                }
+            }
         }
     });
     
@@ -118,6 +125,10 @@ function setupConnectable(element) {
             sourceTable = null;
             targetTable = null;
             isDrawing = false;
+            let tablelist = document.getElementsByTagName('table')
+            for(el of tablelist){
+                    el.classList.remove('selected', 'hover')
+            }
         }
     });
 }
