@@ -120,8 +120,10 @@ function setupConnectable(element) {
         // check if right button is used
         if (isDrawing && e.target.tagName.toLowerCase() !== 'input') {
             targetTable = element;
-            connections.push({from: sourceTable.id, to: targetTable.id});
-            UpdateArrows();
+            if(sourceTable !== targetTable){
+                connections.push({from: sourceTable.id, to: targetTable.id});
+                UpdateArrows();
+            }
             sourceTable = null;
             targetTable = null;
             isDrawing = false;
