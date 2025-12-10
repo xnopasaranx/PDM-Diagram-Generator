@@ -12,18 +12,34 @@ const container = document.getElementById('container');
 
 container.addEventListener("contextmenu", function(e) {
     e.preventDefault();
-    if(container === e.target){
-      // don't cause click event if target is not the container element  
+    if(container === e.target){ 
       GenerateTaskOnClick(e);
     }
 });
 
+document.addEventListener('keydown', (e) => {
+    if(e.key === 'Delete'){
+        let element = document.getElementsByClassName('selected')[0];
+        removeNode(element);
+        endSelection();
+    }
+})
 
 class Task {
     constructor(x, y){
         let id = 1;
         if(tables.length > 0){
-            id = tables.length;
+            for(const [index, value] of tables.entries()){
+                if(tables.length > 1 && (tables[index]-tables[index-1]!==1)){
+                    id = value + 1;
+                    console.log(index)
+                    console.log(value)
+                    console.log(tables)
+                    break;
+                } else {
+                    id = tables.length + 2;
+                }
+            }
         }
         this.id = id;
         this.x = x;
@@ -58,10 +74,9 @@ class Task {
         // use passed coordinates to position element, if defined
         table.style.left = `${this.x}px`;
         table.style.top = `${this.y}px`;
-
     
         setupDraggable(table);
-        setupConnectable(table);
+        setupSelectable(table);
         container.appendChild(table);
         tables[this.id] = this.id;
     }
@@ -69,14 +84,10 @@ class Task {
 
 
 function GenerateTaskOnClick(e) {
-// Generate this task after a click event, to make editing easier
-let table = new Task(e.offsetX, e.offsetY);
-table.GenTable();
+    // Generate this task after a click event, to make editing easier
+    let table = new Task(e.offsetX, e.offsetY);
+    table.GenTable();
 }
-
-// function ConvertTaskNumberToLetter(taskNumber) {
-//     return String.fromCharCode(64 + taskNumber);
-// }
 
 function setupDraggable(element) {
     element.addEventListener('mousedown', (e) => {
@@ -103,41 +114,69 @@ function setupDraggable(element) {
     });
 }
 
-function setupConnectable(element) {
+
+function select(el){
+    sourceTable = el;
+    isDrawing = true;
+    sourceTable.classList.add('selected')
+    let tablelist = document.getElementsByTagName('table')
+    for(el of tablelist){
+        if(!el.classList.contains('selected')){
+            el.classList.add('hover')
+        }
+    }
+}
+
+function connect(el){
+    targetTable = el;
+    let connection = {from: sourceTable.id, to: targetTable.id}
+    let exists = connections.some(e => (e.from === sourceTable.id && e.to === targetTable.id) || (e.from === targetTable.id && e.to === sourceTable.id))
+    if((sourceTable !== targetTable) && !exists){
+        connections.push(connection);
+    } else if ((sourceTable !== targetTable) && exists){
+        connections = connections.filter(obj => !((obj.from === connection.from && obj.to === connection.to) || (obj.to === connection.from && obj.from === connection.to)))
+    }
+    endSelection();
+}
+
+function removeEl(el){
+    el.remove();
+    console.log(tables)
+}
+
+function removeNode(el){
+    let id = el.id;
+    tables.splice(tables.indexOf(id), 1);
+    removeEl(el);
+}
+
+function endSelection(){
+    UpdateArrows();
+    sourceTable = null;
+    targetTable = null;
+    isDrawing = false;
+    let tablelist = document.getElementsByTagName('table')
+    for(el of tablelist){
+        el.classList.remove('selected', 'hover')
+    }
+}
+
+function setupSelectable(element) {
     element.addEventListener('contextmenu', (e) => {
-        // check if right button is used
         if (!isDrawing && e.target.tagName.toLowerCase() !== 'input' ) {
-            sourceTable = element;
-            isDrawing = true;
-            sourceTable.classList.add('selected')
-            let tablelist = document.getElementsByTagName('table')
-            for(el of tablelist){
-                if(!el.classList.contains('selected')){
-                    el.classList.add('hover')
-                }
-            }
+            select(element);
         }
     });
     
+    element.addEventListener('contextmenu', (e) => {
+        if (!isDrawing && e.target.tagName.toLowerCase() !== 'input' ) {
+            select(element);
+        }
+    });
+
     element.addEventListener('click', (e) => {
-        // check if right button is used
         if (isDrawing && e.target.tagName.toLowerCase() !== 'input') {
-            targetTable = element;
-            let connection = {from: sourceTable.id, to: targetTable.id}
-            let exists = connections.some(e => (e.from === sourceTable.id && e.to === targetTable.id) || (e.from === targetTable.id && e.to === sourceTable.id))
-            if((sourceTable !== targetTable) && !exists){
-                connections.push(connection);
-            } else if ((sourceTable !== targetTable) && exists){
-                connections = connections.filter(obj => !((obj.from === connection.from && obj.to === connection.to) || (obj.to === connection.from && obj.from === connection.to)))
-            }
-            UpdateArrows();
-            sourceTable = null;
-            targetTable = null;
-            isDrawing = false;
-            let tablelist = document.getElementsByTagName('table')
-            for(el of tablelist){
-                    el.classList.remove('selected', 'hover')
-            }
+            connect(element);
         }
     });
 }
