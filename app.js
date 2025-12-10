@@ -20,6 +20,47 @@ container.addEventListener("contextmenu", function(e) {
 });
 
 
+class Task {
+    constructor(id, x, y){
+        this.id = id;
+        this.x = x;
+        this.y = y;
+        this.connection = [];
+    }
+
+    GenTable() {
+        const table = document.createElement('table');
+        table.id = String(this.id);
+
+        table.innerHTML =
+        `<tr>
+            <td colspan="2">ES <input type="text" class="numtab" id="es-${this.id}"></td>
+            <td colspan="2">EF <input type="text" class="numtab" id="ef-${this.id}"></td>
+        </tr>
+        <tr>
+            <th colspan="4">${ConvertTaskNumberToLetter(this.id)}</th>
+        </tr>
+        <tr>
+            <td>LS <br> <input type="text" class="numtab" id="ls-${this.id}"></br></td>
+            <td>Dur <br> <input type="text" class="numtab" id="dur-${this.id}"></br></td>
+            <td>TF <br><input type="text" class="numtab" id="tf-${this.id}"></br></td>
+            <td>LF <br><input type="text" class="numtab" id="lf-${this.id}"></br></td>
+        </tr>`;
+    
+        // Setting the initial position of the tables to the top-left corner
+        // use passed coordinates to position element, if defined
+        table.style.left = `${this.x}px`;
+        table.style.top = `${this.y}px`;
+
+    
+        setupDraggable(table);
+        setupConnectable(table);
+        container.appendChild(table);
+        tables[this.id] = this.id;
+    }
+}
+
+
 function GenerateTaskOnClick(e) {
   // Generate this task after a click event, to make editing easier
  let id = 1;
@@ -27,9 +68,12 @@ function GenerateTaskOnClick(e) {
   id = tables.length;
  }
 
- let cursorpos_xy = [e.offsetX, e.offsetY];
+let table = new Task(id, e.offsetX, e.offsetY)
+table.GenTable()
 
- GenTable(id, cursorpos_xy);
+//  let cursorpos_xy = [e.offsetX, e.offsetY];
+
+ //GenTable(id, cursorpos_xy);
 }
 
 function GenerateTasks() {
@@ -40,40 +84,41 @@ function GenerateTasks() {
     
 
     for (let i = 1; i <= count; i++) {
-        GenTable(i);
+        let table = new Task(i,10,10)
+        table.GenTable();
     }
 }
 
-function GenTable(id, cursorpos_xy = null) {
-    const table = document.createElement('table');
-    table.id = String(id);
+// function GenTable(id, cursorpos_xy = null) {
+//     const table = document.createElement('table');
+//     table.id = String(id);
 
-    table.innerHTML =
-    `<tr>
-        <td colspan="2">ES <input type="text" class="numtab" id="es-${id}"></td>
-        <td colspan="2">EF <input type="text" class="numtab" id="ef-${id}"></td>
-    </tr>
-    <tr>
-        <th colspan="4">${ConvertTaskNumberToLetter(id)}</th>
-    </tr>
-    <tr>
-        <td>LS <br> <input type="text" class="numtab" id="ls-${id}"></br></td>
-        <td>Dur <br> <input type="text" class="numtab" id="dur-${id}"></br></td>
-        <td>TF <br><input type="text" class="numtab" id="tf-${id}"></br></td>
-        <td>LF <br><input type="text" class="numtab" id="lf-${id}"></br></td>
-    </tr>`;
+//     table.innerHTML =
+//     `<tr>
+//         <td colspan="2">ES <input type="text" class="numtab" id="es-${id}"></td>
+//         <td colspan="2">EF <input type="text" class="numtab" id="ef-${id}"></td>
+//     </tr>
+//     <tr>
+//         <th colspan="4">${ConvertTaskNumberToLetter(id)}</th>
+//     </tr>
+//     <tr>
+//         <td>LS <br> <input type="text" class="numtab" id="ls-${id}"></br></td>
+//         <td>Dur <br> <input type="text" class="numtab" id="dur-${id}"></br></td>
+//         <td>TF <br><input type="text" class="numtab" id="tf-${id}"></br></td>
+//         <td>LF <br><input type="text" class="numtab" id="lf-${id}"></br></td>
+//     </tr>`;
    
-    // Setting the initial position of the tables to the top-left corner
-    // use passed coordinates to position element, if defined
-    table.style.left = `${(cursorpos_xy ? cursorpos_xy[0] : 10)}px`;
-    table.style.top = `${(cursorpos_xy ? cursorpos_xy[1] : 10)}px`;
+//     // Setting the initial position of the tables to the top-left corner
+//     // use passed coordinates to position element, if defined
+//     table.style.left = `${(cursorpos_xy ? cursorpos_xy[0] : 10)}px`;
+//     table.style.top = `${(cursorpos_xy ? cursorpos_xy[1] : 10)}px`;
 
    
-    setupDraggable(table);
-    setupConnectable(table);
-    container.appendChild(table);
-    tables[id] = id;
-}
+//     setupDraggable(table);
+//     setupConnectable(table);
+//     container.appendChild(table);
+//     tables[id] = id;
+// }
 
 function ConvertTaskNumberToLetter(taskNumber) {
     return String.fromCharCode(64 + taskNumber);
