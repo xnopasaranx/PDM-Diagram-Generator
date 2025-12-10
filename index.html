@@ -45,17 +45,10 @@
 </style>
 <body>
     <div id="controls">
-        <label>Number of Tasks: 
-            <input type="number" class="numcontrol" id="taskcount" min="1" value="2">
-        </label>
-        <button onclick="GenerateTasks()">Generate Tasks</button>
-
+        <p>Right click on empty space to create a task</p>
+        <p>Right click on task and left click on next task to connect with arrow</p>
         <br><br>
 
-        <label>Connect Tasks (format: "A->B,C;B->D,C"):
-            <input onkeydown="if (event.keyCode == 13) AddConnections()" type="text" class="textcontrol" id="connection-input" placeholder="A->B,C;B->D,C">
-        </label>
-        <button onclick="AddConnections()">Add Connections</button>
         <button onclick="ClearConnections()">Clear Connections</button>
     </div>
 

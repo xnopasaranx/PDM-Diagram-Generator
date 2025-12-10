@@ -9,7 +9,6 @@ let targetTable = null;
 // Initializing draw
 let draw = SVG().addTo('#arrowLayer').size('100%', '100%');
 const container = document.getElementById('container');
-const count = document.getElementById('taskcount').value;
 
 container.addEventListener("contextmenu", function(e) {
     e.preventDefault();
@@ -72,18 +71,6 @@ let table = new Task(id, e.offsetX, e.offsetY);
 table.GenTable();
 }
 
-function GenerateTasks() {
-    // Clearing existing tasks and connections
-    container.innerHTML = '<svg id="arrowLayer"></svg>';
-    tables = [];
-    connections = [];
-    
-    for (let i = 1; i <= count; i++) {
-        let table = new Task(i,10,10);
-        table.GenTable();
-    }
-}
-
 function ConvertTaskNumberToLetter(taskNumber) {
     return String.fromCharCode(64 + taskNumber);
 }
@@ -133,25 +120,6 @@ function setupConnectable(element) {
             isDrawing = false;
         }
     });
-}
-
-function AddConnections(connections = []) {
-    const input = document.getElementById('connection-input').value;
-    const pairs = input.split(';');
-   
-    pairs.forEach(pair => {
-        const [source, targets] = pair.split('->');
-        if (targets) {
-            targets.split(',').forEach(target => {
-                connections.push({
-                    from: ConvertTaskLetterToNumber(source.trim()),
-                    to: ConvertTaskLetterToNumber(target.trim())
-                });    
-            });
-        }
-    });
-    UpdateArrows();
-    //console.log("Parsed Connections:", connections);
 }
 
 function ConvertTaskLetterToNumber(taskLetter) {
