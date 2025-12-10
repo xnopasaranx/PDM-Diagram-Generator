@@ -20,11 +20,19 @@ container.addEventListener("contextmenu", function(e) {
 
 
 class Task {
-    constructor(id, x, y){
+    constructor(x, y){
+        let id = 1;
+        if(tables.length > 0){
+            id = tables.length;
+        }
         this.id = id;
         this.x = x;
         this.y = y;
         this.connection = [];
+    }
+
+    ConvertTaskNumberToLetter() {
+        return String.fromCharCode(64 + this.id);
     }
 
     GenTable() {
@@ -37,7 +45,7 @@ class Task {
             <td colspan="2">EF <input type="text" class="numtab" id="ef-${this.id}"></td>
         </tr>
         <tr>
-            <th colspan="4">${ConvertTaskNumberToLetter(this.id)}</th>
+            <th colspan="4">${this.ConvertTaskNumberToLetter()}</th>
         </tr>
         <tr>
             <td>LS <br> <input type="text" class="numtab" id="ls-${this.id}"></br></td>
@@ -61,24 +69,19 @@ class Task {
 
 
 function GenerateTaskOnClick(e) {
-  // Generate this task after a click event, to make editing easier
- let id = 1;
- if(tables.length > 0){
-  id = tables.length;
- }
-
-let table = new Task(id, e.offsetX, e.offsetY);
+// Generate this task after a click event, to make editing easier
+let table = new Task(e.offsetX, e.offsetY);
 table.GenTable();
 }
 
-function ConvertTaskNumberToLetter(taskNumber) {
-    return String.fromCharCode(64 + taskNumber);
-}
+// function ConvertTaskNumberToLetter(taskNumber) {
+//     return String.fromCharCode(64 + taskNumber);
+// }
 
 function setupDraggable(element) {
     element.addEventListener('mousedown', (e) => {
         // only enter dragging mode if left button is used
-        if (e.target.tagName.toLowerCase() !== 'input' && e.button === 0) {
+        if (!isDrawing && e.target.tagName.toLowerCase() !== 'input' && e.button === 0) {
             isDragging = true;
             currentTable = element;
             offset.x = e.clientX - element.offsetLeft;
