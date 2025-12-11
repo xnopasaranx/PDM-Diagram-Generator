@@ -1,4 +1,4 @@
-let tables = [];
+let tables = {};
 let connections = [];
 let isDragging = false;
 let isDrawing = false;
@@ -27,20 +27,26 @@ document.addEventListener('keydown', (e) => {
 
 class Task {
     constructor(x, y){
-        let id = 1;
-        if(tables.length > 0){
-            for(const [index, value] of tables.entries()){
-                if(tables.length > 1 && (tables[index]-tables[index-1]!==1)){
-                    id = value + 1;
-                    console.log(index)
-                    console.log(value)
-                    console.log(tables)
+        let id = 0;
+        if(Object.keys(tables).length > 0){
+            let keys = Object.keys(tables);
+            for(const [key, val] of Object.entries(tables)){
+                let next = keys[(keys.indexOf(key) + 1) % keys.length]
+
+                console.log(next)
+                 if(Object.keys(tables).length > 1 && (tables[next] - tables[key]) > 1){
+                    id = tables[key] + 1;
                     break;
+                } else if (Object.keys(tables).length > 1 && (next - key) === 1){
+                    id = Object.keys(tables).length;
                 } else {
-                    id = tables.length + 2;
+                    id = Object.keys(tables).length;
                 }
             }
         }
+        tables[id] = id;
+        console.log(id)
+        console.log(tables)
         this.id = id;
         this.x = x;
         this.y = y;
@@ -48,7 +54,7 @@ class Task {
     }
 
     ConvertTaskNumberToLetter() {
-        return String.fromCharCode(64 + this.id);
+        return String.fromCharCode(65 + this.id);
     }
 
     GenTable() {
@@ -78,7 +84,6 @@ class Task {
         setupDraggable(table);
         setupSelectable(table);
         container.appendChild(table);
-        tables[this.id] = this.id;
     }
 }
 
@@ -129,8 +134,8 @@ function select(el){
 
 function connect(el){
     targetTable = el;
-    let connection = {from: sourceTable.id, to: targetTable.id}
-    let exists = connections.some(e => (e.from === sourceTable.id && e.to === targetTable.id) || (e.from === targetTable.id && e.to === sourceTable.id))
+    let connection = {from: sourceTable.id, to: targetTable.id};
+    let exists = connections.some(e => (e.from === sourceTable.id && e.to === targetTable.id) || (e.from === targetTable.id && e.to === sourceTable.id));
     if((sourceTable !== targetTable) && !exists){
         connections.push(connection);
     } else if ((sourceTable !== targetTable) && exists){
@@ -146,7 +151,8 @@ function removeEl(el){
 
 function removeNode(el){
     let id = el.id;
-    tables.splice(tables.indexOf(id), 1);
+    delete tables[id];
+    console.log("remove id "+id)
     removeEl(el);
 }
 
@@ -184,7 +190,7 @@ function setupSelectable(element) {
 function ConvertTaskLetterToNumber(taskLetter) {
     const uppercaseLetter = taskLetter.toUpperCase();
     const charCode = uppercaseLetter.charCodeAt(0);
-    return charCode - 64;
+    return charCode - 65;
 }
 
 function UpdateArrows() {
